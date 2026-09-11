@@ -9,16 +9,19 @@ permissions:
 
 jobs:
   extract:
-    if: ${{ !exists('frontend/package.json') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Extract project source
+      - name: Extract project source when needed
         run: |
-          unzip -o WeatherGPT-ReadyToPublish.zip -d .
-          rm -f WeatherGPT-ReadyToPublish.zip
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet || git commit -m "Prepare WeatherGPT source for deployment"
-          git push
+          if [ ! -f frontend/package.json ]; then
+            unzip -o WeatherGPT-ReadyToPublish.zip -d .
+            rm -f WeatherGPT-ReadyToPublish.zip
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git diff --cached --quiet || git commit -m "Prepare WeatherGPT source for deployment"
+            git push
+          else
+            echo "WeatherGPT source is already extracted."
+          fi
